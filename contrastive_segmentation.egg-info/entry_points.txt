@@ -1,0 +1,3 @@
+[console_scripts]
+evaluate = src.scripts.evaluate:main
+train = src.scripts.train:main

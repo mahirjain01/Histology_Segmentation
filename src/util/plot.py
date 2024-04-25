@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from matplotlib.patches import Rectangle
-
+from loguru import logger
 
 def plotable(image: torch.Tensor):
     if len(image.shape) == 2:
@@ -71,7 +71,6 @@ def plot_selected_crops(data, path=None, dpi=300):
 markings = np.array([(0, 0, 0, 0), (0, 255, 50, 255)])
 contours = np.array([(0, 0, 0, 0), (0, 0, 255, 255), (0, 255, 0, 255), (255, 0, 0, 255)])
 
-
 def plot_mask(images, masks, attention_maps, path=None, dpi=300):
     assert len(images) == len(masks) == len(attention_maps)
     n = len(images)
@@ -83,13 +82,15 @@ def plot_mask(images, masks, attention_maps, path=None, dpi=300):
         if mask.dim() == 3:
             mask = mask.squeeze(0)
         mask = mask.type(torch.IntTensor)
-        axs[1][i].imshow(markings[mask])
+
+        # logger.info(mask.shape)
+        axs[1][i].imshow(markings[mask.squeeze()])
 
         for j, attention_map_channel in enumerate(attention_map, start=0):
             axs[2 * j + 2][i].imshow(plotable(attention_map_channel))
             diffs = (attention_map_channel > 0.5).squeeze(0).type(torch.IntTensor)
-            diffs[torch.logical_and(diffs, 1 - mask)] = 3
-            diffs[torch.logical_and(1 - diffs, mask)] = 2
+            diffs[torch.logical_and(diffs, ~mask.squeeze())] = 3
+            diffs[torch.logical_and(~diffs, mask.squeeze())] = 2
             axs[2 * j + 3][i].imshow(contours[diffs])
 
         for j in range(2 + 2 * n_channels):
@@ -104,24 +105,31 @@ def plot_mask(images, masks, attention_maps, path=None, dpi=300):
 
 
 def plot_mask_2(images, masks, attention_maps, predictions, path=None, dpi=300):
-    assert len(images) == len(masks) == len(attention_maps)
-    n = len(images)
+    # assert len(images) == len(masks) == len(attention_maps)
+    # n = len(images)
+    assert len(images) >= 5 and len(masks) >= 5 and len(attention_maps) >= 5 and len(predictions) >= 5, "Insufficient data for plotting"
+    n = 5
     n_channels = len(attention_maps[1])
     fig, axs = plt.subplots(2 + 2 * n_channels, n, figsize=(n, 2 + 2 * n_channels))
-    for i, (image, mask, attention_map, prediction) in enumerate(zip(images, masks, attention_maps, predictions)):
+    for i in range(5):
+        image = images[i]
+        mask = masks[i]
+        attention_map = attention_maps[i]
+        prediction = predictions[i]
+
         axs[0][i].imshow(plotable(image))
 
         if mask.dim() == 3:
             mask = mask.squeeze(0)
         mask = mask.type(torch.IntTensor)
-        axs[1][i].imshow(markings[mask])
+        axs[1][i].imshow(markings[mask.squeeze()])
 
         for j, (attention_map_channel, prediction_channel) in enumerate(zip(attention_map, prediction), start=0):
             axs[2 * j + 2][i].imshow(plotable(attention_map_channel))
             # diffs = (attention_map_channel > 0.5).squeeze(0).type(torch.IntTensor)
             diffs = prediction_channel
-            diffs[torch.logical_and(diffs, 1 - mask)] = 3
-            diffs[torch.logical_and(1 - diffs, mask)] = 2
+            diffs[torch.logical_and(diffs, ~mask.squeeze())] = 3
+            diffs[torch.logical_and(~diffs, mask.squeeze())] = 2
             axs[2 * j + 3][i].imshow(contours[diffs])
 
         for j in range(2 + 2 * n_channels):

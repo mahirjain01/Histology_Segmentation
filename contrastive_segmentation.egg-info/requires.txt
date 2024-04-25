@@ -1,0 +1,9 @@
+kornia
+matplotlib
+numpy
+Pillow
+pytorch-lightning>=1.7
+scikit-image
+scipy
+torch
+torchvision

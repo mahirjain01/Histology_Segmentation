@@ -1,7 +1,0 @@
-__pycache__/
-logs/
-venv/
-.DS_Store
-*.egg-info
-/data/
-.mypy_cache

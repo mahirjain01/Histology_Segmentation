@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: contrastive-segmentation
+Version: 0.0.1
+Requires-Python: >=3.8
+Requires-Dist: kornia
+Requires-Dist: matplotlib
+Requires-Dist: numpy
+Requires-Dist: Pillow
+Requires-Dist: pytorch-lightning>=1.7
+Requires-Dist: scikit-image
+Requires-Dist: scipy
+Requires-Dist: torch
+Requires-Dist: torchvision

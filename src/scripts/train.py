@@ -70,7 +70,7 @@ def train(model: pl.LightningModule, trainer: pl.Trainer, train_dataset: Dataset
         validation_data_loader = DataLoader(validation_dataset, batch_size=min(10, len(validation_dataset)), shuffle=False, num_workers=num_workers)
 
     trainer.fit(model, train_data_loader, validation_data_loader if validation_dataset else None)
-
+ 
 
 def setup_plotting() -> None:
     def plots_path(log_dir: str):
@@ -121,7 +121,7 @@ def main() -> None:
     train_dataset, validation_dataset, sampler, similarity_measure, confidence_network, featuriser_network, args = get_arguments(parser)
 
     model = src.framework.Model(
-        counter=src.framework.Counter(args.out_channels, args.patch_size, 20),
+        counter=src.framework.Counter(args.out_channels, args.patch_size, 10),
         sampler=sampler,
         similarity_measure=similarity_measure,
         confidence_network=confidence_network,
